@@ -351,6 +351,7 @@
       this.wrapProgress = 0;
       this.bundleGrowth = 0;
       this.centered = false;
+      this.centerAnim = null;
       this.flowers = [];
       this.resize();
       window.addEventListener("resize", () => {
@@ -397,9 +398,23 @@
     }
 
     relayoutCenter() {
+      // Animar el desplazamiento hacia el centro para que no sea un salto.
+      const isNarrow = this.width < 520;
+      const targetY = this.height * (isNarrow ? 0.56 : 0.52);
+      const fromY = this.anchorY ?? targetY;
+
       this.centered = true;
-      this.layoutBouquet();
-      if (this.active) this.draw();
+      this.centerAnim = {
+        fromY,
+        toY: targetY,
+        start: performance.now(),
+        duration: 900,
+      };
+
+      if (!this.running && this.active) {
+        this.running = true;
+        this.tick();
+      }
     }
 
     flowerPos(stem) {
@@ -446,6 +461,22 @@
     }
 
     draw() {
+      // Si estamos animando el centrado, interpolar anchorY suavemente.
+      if (this.centerAnim) {
+        const now = performance.now();
+        const t = clamp((now - this.centerAnim.start) / this.centerAnim.duration, 0, 1);
+        const eased = easeOutCubic(t);
+        this.anchorY = this.centerAnim.fromY + (this.centerAnim.toY - this.centerAnim.fromY) * eased;
+
+        const isNarrow = this.width < 520;
+        this.headY = this.anchorY - (isNarrow ? 72 : 88) * this.bouquetScale;
+        this.gatherY = this.anchorY - 14 * this.bouquetScale;
+
+        if (t >= 1) {
+          this.centerAnim = null;
+        }
+      }
+
       const ctx = this.ctx;
       ctx.clearRect(0, 0, this.width, this.height);
       if (!this.active) return;
@@ -505,7 +536,8 @@
       this.draw();
 
       const done = this.flowers.every((f) => f.bloom >= 1);
-      if (this.active && (elapsed < 3.8 || !done)) {
+      const shouldKeepAnimating = this.centerAnim !== null;
+      if (this.active && (elapsed < 3.8 || !done || shouldKeepAnimating)) {
         requestAnimationFrame(() => this.tick());
       } else {
         this.running = false;
@@ -516,6 +548,7 @@
     clear() {
       this.active = false;
       this.centered = false;
+      this.centerAnim = null;
       this.flowers = [];
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.running = false;
