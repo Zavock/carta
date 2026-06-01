@@ -3,6 +3,7 @@
   const btn = document.getElementById("btnFlores");
   const letter = document.getElementById("letter");
   const scene = document.querySelector(".scene");
+  const bouquetMessage = document.getElementById("bouquetMessage");
   const canvasFlores = document.getElementById("flores");
   const canvasCorazones = document.getElementById("corazones");
 
@@ -30,6 +31,8 @@
         scene.classList.remove("scene--blooming");
         scene.classList.add("scene--solo");
         garden.relayoutCenter();
+        bouquetMessage?.classList.add("bouquet-message--show");
+        bouquetMessage?.setAttribute("aria-hidden", "false");
       });
     }, 2800);
   });
