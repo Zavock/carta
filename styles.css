@@ -224,6 +224,27 @@ body {
   margin-bottom: 1.25rem !important;
 }
 
+.letter__postscript {
+  margin-top: 1.5rem;
+  padding: 1rem 0 0 1.15rem;
+  border-left: 2px solid rgba(201, 123, 138, 0.4);
+}
+
+.letter__postscript-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+  margin-bottom: 0.55rem !important;
+}
+
+.letter__postscript p:not(.letter__postscript-label) {
+  font-style: italic;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
 .letter__closing {
   margin-top: 1.75rem !important;
   text-align: right;
